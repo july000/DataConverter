@@ -3,28 +3,43 @@ import configparser
 import sys
 import math
 import pymap3d
+import json
+
+def load_json(input_file):
+    with open(input_file) as f:
+        return json.load(f)
 
 def read_config_file(config_file):
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(allow_no_value=True)
     # case-sensitive when read from config file
     config.optionxform = str
     try:
         config.read(config_file)
+        file_type = config['FileType']
+        json_param = config['Json']
         constant = config.items('Const')
         column_settings = config.items('ColumnSettings')
         series_conversion_rules = config.items('SeriesRules')
         dataframe_conversion_rules = config.items('DataframeRules')
-        return dict(constant), dict(column_settings), dict(series_conversion_rules), dict(dataframe_conversion_rules)
+        return dict(file_type), dict(json_param), dict(constant), dict(column_settings), dict(series_conversion_rules), dict(dataframe_conversion_rules)
     except Exception as e:
         print(f"Error in reading config file: {e}")
         sys.exit()
 
-def read_csv_file(input_file):
+def read_file(file_type, json_param, input_file):
     try:
-        df = pd.read_csv(input_file)
+        if file_type['type'] == 'csv':
+            df = pd.read_csv(input_file)
+        elif file_type['type'] == 'excel':
+            df = pd.read_excel(input_file)
+        elif file_type['type'] == 'txt':
+            df = pd.read_csv(input_file, sep="\s+")
+        elif file_type['type'] == 'json':
+            json_data = load_json(input_file)
+            df = pd.json_normalize(json_data, record_path=eval(json_param['record_path']), meta=eval(json_param['metadata']))
         return df
     except Exception as e:
-        print(f"Error in reading CSV file: {e}")
+        print(f"Error in reading {file_type} file: {e}")
         sys.exit()
 
 # 根据指定的列名和转换规则，转换 DataFrame，并生成转换后的 CSV 文件
@@ -68,10 +83,11 @@ def write_csv_file(output_file, df):
 
 if __name__ == '__main__':
     config_file = 'config.ini'
-    constant, column_settings, series_conversion_rules, dataframe_conversion_rules = read_config_file(config_file)
+    file_type, json_param, constant, column_settings, series_conversion_rules, dataframe_conversion_rules = read_config_file(config_file)
 
     input_file = 'offset_flatten_rsm_30_all.csv'
-    df = read_csv_file(input_file)
+    # input_file = 'G:\\CyTrafficEditor\\CyTraffic\\data\\test_cases\\zhilian\\dumps\\1687321540.json'
+    df = read_file(file_type, json_param, input_file)
 
     # 根据列名和转换规则进行 DataFrame 转换
     generated_df = process_data_frame(df, constant, column_settings, series_conversion_rules, dataframe_conversion_rules)
