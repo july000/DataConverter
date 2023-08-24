@@ -1,0 +1,43 @@
+{
+    "type": 14,
+    "data": {
+        "mecEsn": "440113GXX000200000031",
+        "rsms": [
+            {
+                "refPos": {
+                    "lon": 0,
+                    "lat": 0,
+                    "ele": 0
+                },
+                "participants": [
+                    {
+                        "vehicleColor": 0,
+                        "secMark": 0,
+                        "heading": 23185,
+                        "accuracy": "9",
+                        "source": 7,
+                        "plateNum": "",
+                        "speed": 232,
+                        "plateColor": 0,
+                        "size": {
+                            "length": 175,
+                            "width": 60,
+                            "height": 60
+                        },
+                        "pos": {
+                            "lon": 113.496478,
+                            "lat": 23.01688,
+                            "ele": 0
+                        },
+                        "vehicleModel": "",
+                        "vehicleClass": 0,
+                        "ptcId": 110,
+                        "ptcType": 2,
+                        "timestamp": 1687321500538
+                    }
+                ]
+            }
+        ],
+        "timestamp": 1687321500802
+    }
+}
